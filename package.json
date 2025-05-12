@@ -18,7 +18,10 @@
         "test": "jest",
         "coverage": "jest --coverage",
         "prepare": "husky install",
-        "build:analyze": "BUNDLE_ANALYZE=true rsbuild build"
+        "build:analyze": "BUNDLE_ANALYZE=true rsbuild build",
+        "copy-tools": "node scripts/copy-tools.js",
+        "prebuild": "npm run copy-tools",
+        "prestart": "npm run copy-tools"
     },
     "dependencies": {
         "@datadog/browser-rum": "^5.31.1",

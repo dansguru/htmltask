@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOT AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: white;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      display: flex;
+      flex-grow: 1;
+      padding: 2rem;
+      gap: 4rem;
+      justify-content: space-between;
+      flex-direction: row;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .right-side {
+        order: -1;
+      }
+    }
+
+    .form, .right-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form .select-wrapper,
+    .form .input-wrapper {
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .form input {
+      padding: 0.75rem;
+      border-radius: 3px;
+      background-color: #1f1f1f;
+      color: white;
+      box-shadow: 0 0 5px 0px orange;
+      border: none;
+      width: 100%;
+      box-sizing: border-box;
+      padding-right: 4rem; /* make room for hint */
+    }
+
+    .form input::placeholder {
+      color: #ccc;
+    }
+
+    .form .input-wrapper .hint {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+
+    .form select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 3px;
+      background-color: #1f1f1f;
+      color: white;
+      box-shadow: 0 0 5px 0px orange;
+      border: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .select-wrapper::after {
+      content: "\25BC";
+      color: orange;
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .form select:focus,
+    .form input:focus {
+      outline: none;
+      box-shadow: 0 0 5px 0px orange;
+    }
+
+
+    .bot-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f1f1f;
+      padding: 1rem;
+      border-radius: 5px;
+      width: 100%;
+      box-shadow: 0 0 5px 0px orange;
+    }
+
+    .run-btn {
+      padding: 0.75rem;
+      background-color: orange;
+      color: #121212;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .status-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .status-container .status {
+      font-style: italic;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: gray;
+      z-index: 2;
+      margin: 0 5px;
+    }
+
+    .active {
+      background-color: orange;
+    }
+
+    .table-container {
+      width: 100%;
+      margin-top: 1rem;
+      border-radius: 0 0 5px 5px;
+      overflow: hidden;
+      box-shadow: 0 0 5px 0px orange;
+      max-height: 200px; /* Set fixed height */
+      min-height: 200px; /* Set fixed height */
+      overflow-y: auto;  /* Scroll vertically when content overflows */
+    }
+
+    /* Optional: make the thead fixed */
+    thead th {
+      position: sticky;
+      top: 0;
+      background-color: orange;
+      color: white;
+      z-index: 2;
+    }
+
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      background-color: #1f1f1f;
+      border: 1px solid #333;
+      font-size: 0.8rem;
+    }
+
+    th, td {
+      padding: 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background-color: orange;
+      color: white;
+    }
+
+    .summary {
+      margin-top: 1rem;
+      background-color: #1f1f1f;
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      border-radius: 5px;
+      box-shadow: 0 0 5px 0px orange;
+    }
+
+    .summary div {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: white;
+      border-radius: 5px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 5px 0px orange;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .summary div:hover {
+      box-shadow: 0 0 5px 0px orange;
+    }
+
+    .total-stake {
+      background-color: blue;
+      box-shadow: 0 0 5px 0px blue;
+      padding: 0;
+      font-size: 0.625rem;
+    }
+
+    .total-won {
+      background-color: green;
+      box-shadow: 0 0 5px 0px green;
+    }
+
+    .total-lost {
+      background-color: red;
+      box-shadow: 0 0 5px 0px red;
+    }
+
+    .profit-loss {
+      background-color: blue;
+      box-shadow: 0 0 5px 0px blue;
+    }
+
+    .dot-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .dots-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .dots-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: calc(16.66% + 5px);
+      right: calc(16.66% + 5px);
+      height: 1px;
+      background-color: gray;
+      z-index: 0;
+      transform: translateY(-50%);
+    }
+
+    .dots-container::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: calc(16.66% + 5px);
+      right: var(--progress-right, calc(50% + 5px));
+      height: 1px;
+      background-color: orange;
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+
+    .right-side .status-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bot-status-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .bot-status-container .status {
+      margin-left: 1rem;
+    }
+
+    .glow {
+      animation: glowPulse 0.5s infinite ease-in-out;
+      box-shadow: 0 0 5px #00ffcc;
+    }
+
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 0 5px #00ffcc;
+        opacity: 1;
+      }
+      50% {
+        box-shadow: 0 0 20px #00ffcc;
+        opacity: 0.4;
+      }
+      100% {
+        box-shadow: 0 0 5px #00ffcc;
+        opacity: 1;
+      }
+    }
+
+    .right-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+
+    .right-side .dots-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .summary .label {
+      font-size: 0.75rem;
+    }
+
+    .summary .amount {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    /* Responsive styling for small screens */
+    @media (max-width: 600px) {
+      .summary .label {
+        font-size: 10px;
+      }
+
+      .summary .amount {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="right-side">
+      <div class="bot-area">
+        <div class="bot-status-container">
+          <button class="run-btn" id="run-btn">Run</button>
+          <div class="status-container">
+            <div class="dots-container">
+              <div class="dot-container"><div class="dot" id="dot1"></div></div>
+              <div class="dot-container"><div class="dot" id="dot2"></div></div>
+              <div class="dot-container"><div class="dot" id="dot3"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Asset</th>
+                <th>Stake</th>
+                <th>Payout</th>
+              </tr>
+            </thead>
+            <tbody id="bot-table-body">
+              <!-- Data will be injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="total-stake">
+          <p class="label">Total Stake</p>
+          <p class="amount" id="total-stake">$0.00</p>
+        </div>
+        <div class="total-won">
+          <p class="label">Total Won</p>
+          <p class="amount" id="total-won">0</p>
+        </div>
+        <div class="total-lost">
+          <p class="label">Total Lost</p>
+          <p class="amount" id="total-lost">0</p>
+        </div>
+        <div class="profit-loss">
+          <p class="label">Profit/Loss</p>
+          <p class="amount" id="profit-loss">$0.00</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form">
+      <div class="select-wrapper">
+        <select id="market-select">
+              <option selected disabled>Quote Name</option>
+              <option value="R_10">Volatility 10 Index</option>
+              <option value="R_25">Volatility 25 Index</option>
+              <option value="R_50">Volatility 50 Index</option>
+              <option value="R_75">Volatility 75 Index</option>
+              <option value="R_100">Volatility 100 Index</option>
+              <option value="R_10H">Volatility 10 (1s) Index</option>
+              <option value="R_25H">Volatility 25 (1s) Index</option>
+              <option value="R_50H">Volatility 50 (1s) Index</option>
+              <option value="R_75H">Volatility 75 (1s) Index</option>
+              <option value="R_100H">Volatility 100 (1s) Index</option>
+              <option value="RDBULL">Bull Market Index</option>
+              <option value="RDBEAR">Bear Market Index</option>
+              <option value="RWM">Step Index</option>
+              <option value="RD10">Crash 1000 Index</option>
+              <option value="RD100">Crash 500 Index</option>
+              <option value="RDP10">Boom 1000 Index</option>
+              <option value="RDP100">Boom 500 Index</option>
+        </select>
+      </div>
+      <!--<div class="select-wrapper">-->
+      <!--  <select>-->
+      <!--    <option selected disabled>Strategy Name</option>-->
+      <!--    <option>Strategy 1</option>-->
+      <!--    <option>Strategy 2</option>-->
+      <!--  </select>-->
+      <!--</div>-->
+      <div class="input-wrapper">
+        <input id="init-stake" type="text" placeholder="Initial Stake" value="1.00" />
+        <span class="hint">Initial stake</span>
+      </div>
+      <div class="input-wrapper">
+        <input id="tp" type="text" placeholder="Take Profit" value="20" />
+        <span class="hint">Take profit</span>
+      </div>
+      <div class="input-wrapper">
+        <input id="sl" type="text" placeholder="Stop Loss" value="20" />
+        <span class="hint">Stop loss</span>
+      </div>
+      <div class="input-wrapper">
+        <input id="plier" type="text" placeholder="Enter Multiplier" value="1.10" />
+        <span class="hint">Multiplier</span>
+      </div>
+      <div class="input-wrapper">
+        <input id="maxstake" type="text" placeholder="Max Stake" value="100" />
+        <span class="hint">Max stake</span>
+      </div>
+      <div class="input-wrapper">
+        <input id="maxruns" type="text" placeholder="Max Trade" value="1000" />
+        <span class="hint">Max Trades</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

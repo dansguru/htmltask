@@ -144,4 +144,72 @@
     .top-bar button {
         width: 100%;
     }
+}
+
+.analysis-tool-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bg-color, #121212);
+}
+
+.analysis-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: var(--bg-color, #121212);
+}
+
+.loading-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-color, #fff);
+    z-index: 1;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(255, 165, 0, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid var(--active-color, orange);
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-color, #fff);
+    z-index: 2;
+    background-color: var(--header-footer-bg, #1e1e1e);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+}
+
+.error-container button {
+    background-color: var(--active-color, orange);
+    color: var(--bg-color, #121212);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.error-container button:hover {
+    background-color: #e69500;
 } 

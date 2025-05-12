@@ -43,8 +43,7 @@
    var stake = initial_stake;
    if (!stake) {stake = 1;}
 
-   // Use the Deriv app_id from window object
-   const wsUrl = 'wss://ws.derivws.com/websockets/v3?app_id=' + (window.DERIV_APP_ID || '71916');
+   const wsUrl = 'wss://ws.binaryws.com/websockets/v3?app_id=' + APP_ID;
    let socket;
    
    try {
