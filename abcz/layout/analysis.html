@@ -21,7 +21,7 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
-    .top-bar * { font-size: 0.775rem  !important; }
+    .top-bar * { font-size: 0.775rem  !important; /* Reduced font size for all elements in top-bar */ }
     .top-bar input, .top-bar select {
       padding: 5px;
       border: none;
@@ -34,10 +34,10 @@
       background-color: #1e1e1e;
       color: orange;
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 4px 8px;  /* Reduced padding for smaller button size */
       box-shadow: 0 0 3px orange;
       border: none;
-      font-size: 14px;
+      font-size: 14px;  /* Reduced font size */
     }
     .top-bar .price {
       font-weight: bold;
@@ -57,16 +57,16 @@
       flex-direction: column;
     }
     .panel input {
-      color: orange !important;
-      background-color: #121212;
+      color: orange !important; /* Force orange color */
+      background-color: #121212; /* Keep the original background color */
       border: none;
       border-radius: 4px;
       text-align: center;
       padding: 4px;
     }
     .panel select {
-      color: orange !important;
-      background-color: #121212;
+      color: orange !important; /* Set text color to orange */
+      background-color: #121212; /* Keep the original background color */
       border: none;
       border-radius: 4px;
       padding: 4px;
@@ -75,6 +75,7 @@
     .panel > *:not(.panel-controls) {
       flex-shrink: 0;
     }
+
     .panel-controls {
       margin-top: auto;
     }
@@ -125,11 +126,11 @@
       margin-top: 10px;
     }
     .button-grid button {
-      padding: 8px 12px;
+      padding: 8px 12px;  /* Reduced padding */
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 14px;  /* Reduced font size */
       box-shadow: 0 0 8px orange;
     }
     .even-odd-bar, .rise-fall-bar, .under-over-bar {
@@ -140,10 +141,10 @@
       color: orange;
     }
     .button-grid button {
-      font-family: 'Poppins', ghetto;
-      font-weight: bold;
-      font-size: 14px;
-      color: black;
+      font-family: 'Poppins', ghetto;  /* Apply the custom font */
+      font-weight: bold;  /* Make the text bold */
+      font-size: 14px;  /* Adjust font size if needed */
+      color: black;  /* Set text color to orange */
     }
     .progress {
       display: flex;
@@ -176,13 +177,13 @@
       font-weight: bold;
     }
     .panel-controls input {
-      width: 30px;
+      width: 30px;  /* Reduced width to fit 4 characters */
       padding: 4px;
       background-color: #121212;
-      border: none;
+      border: none;  /* Removed border */
       color: white;
       border-radius: 4px;
-      text-align: center;
+      text-align: center;  /* Centering text */
     }
     .panel-controls button {
       padding: 6px 12px;
@@ -191,7 +192,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 12px;  /* Reduced font size */
     }
     .hidden {
       display: none;
@@ -199,17 +200,17 @@
     .icon-button {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 15px; /* Added gap between buttons */
     }
     .icon-button i {
-      font-size: 14px;
+      font-size: 14px;  /* Reduced font size for the icon */
     }
     .icon-button button {
       background-color: transparent;
       color: orange;
       border: none;
       border-radius: 50%;
-      width: 30px;
+      width: 30px; /* Reduced size of the button */
       height: 30px;
       display: flex;
       align-items: center;
@@ -218,61 +219,71 @@
     }
     .icon-button button:nth-child(1) {
       background-color: transparent;
-      box-shadow: 0 0 8px orange;
+      box-shadow: 0 0 8px orange;  /* Orange glow for the settings button */
     }
     .icon-button button:nth-child(2) {
       background-color: blue;
-      box-shadow: 0 0 8px orange;
+      box-shadow: 0 0 8px orange; /* brighter glow */
       animation: pulseGlow 1.5s infinite;
     }
-    .dialog {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #1e1e1e;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
-      z-index: 9999;
-      display: none;
-      min-width: 300px;
-    }
-    .dialog .dialog-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: orange;
-      margin-bottom: 15px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: white;
-    }
-    .dialog input {
-      margin: 5px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background-color: #121212;
-      color: #fff;
-      width: 100%;
-    }
-    .dialog button {
-      background-color: orange;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+
+    /* Dialog Styling */
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1e1e1e;
+  padding: 30px;  /* Increased padding for more space */
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
+  z-index: 9999;
+  display: none;
+  min-width: 300px;  /* Set a minimum width */
+}
+
+.dialog .dialog-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: orange;  /* Set title color to orange */
+  margin-bottom: 15px;  /* Add space below title */
+}
+
+/* Group the label and input together */
+.form-group {
+  margin-bottom: 15px;  /* Add space between fields */
+}
+
+.form-group label {
+  display: block;  /* Make the label block to sit above the input */
+  margin-bottom: 5px;  /* Add space between label and input */
+  color: white;  /* Set label color */
+}
+
+.dialog input {
+  margin: 5px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #121212;
+  color: #fff;
+  width: 100%;  /* Make inputs stretch to full width of the container */
+}
+
+.dialog button {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 8px 15px;  /* Increased padding */
+  border-radius: 4px;
+  cursor: pointer;
+}
+
     .glow {
       animation: glowPulse 0.5s infinite ease-in-out;
       box-shadow: 0 0 5px #00ffcc;
     }
+
     @keyframes glowPulse {
       0% {
         box-shadow: 0 0 5px #00ffcc;
@@ -287,6 +298,9 @@
         opacity: 1;
       }
     }
+
+
+    /* Snackbar */
     .snackbar {
       visibility: hidden;
       min-width: 250px;
@@ -315,44 +329,55 @@
       from { opacity: 1; }
       to { opacity: 0; }
     }
+    
     #slider {
       position: absolute;
-      top: 60px;
+      top: 60px; /* set this to match your header's height */
       height: 100%;
       width: 30%;
       background: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       z-index: 2;
       transition: transform 0.4s ease;
+
       background-color: #f0f0f0;
       border: 1px solid #ccc;
-      display: none;
+      display: none; /* Hide slider initially */
     }
+
     #slider.left {
       left: 0;
       transform: translateX(-100%);
     }
+
     #slider.right {
       right: 0;
       transform: translateX(100%);
     }
+
     #slider.open-left {
       transform: translateX(0);
     }
+
     #slider.open-right {
       transform: translateX(0);
     }
+
+
     @media (max-width: 600px) {
       .grid-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Stack panels on smaller screens */
       }
+
       .top-bar {
         flex-direction: column;
         align-items: stretch;
       }
+
       .icon-button {
         justify-content: center;
       }
+
       .top-bar input,
       .top-bar select,
       .top-bar button,
@@ -362,45 +387,57 @@
       .icon-button button {
         transition: all 0.2s ease;
       }
+
       body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
+
       input:focus,
       select:focus {
         outline: none;
         box-shadow: 0 0 5px orange;
       }
+
       #slider {
         height: 100%;
         width: 100%;
       }
+
+
     }
+
+
   </style>
 </head>
 <body>
   <div class="top-bar">
     <select id="symbolSelector">
       <option value="R_10">Volatility 10 Index</option>
-      <option value="R_25">Volatility 25 Index</option>
-      <option value="R_50">Volatility 50 Index</option>
-      <option value="R_75">Volatility 75 Index</option>
-      <option value="R_100">Volatility 100 Index</option>
-      <option value="R_10H">Volatility 10 (1s) Index</option>
-      <option value="R_25H">Volatility 25 (1s) Index</option>
-      <option value="R_50H">Volatility 50 (1s) Index</option>
-      <option value="R_75H">Volatility 75 (1s) Index</option>
-      <option value="R_100H">Volatility 100 (1s) Index</option>
-      <option value="RDBULL">Bull Market Index</option>
-      <option value="RDBEAR">Bear Market Index</option>
-      <option value="RWM">Step Index</option>
-      <option value="RD10">Crash 1000 Index</option>
-      <option value="RD100">Crash 500 Index</option>
-      <option value="RDP10">Boom 1000 Index</option>
-      <option value="RDP100">Boom 500 Index</option>
+              <option value="R_25">Volatility 25 Index</option>
+              <option value="R_50">Volatility 50 Index</option>
+              <option value="R_75">Volatility 75 Index</option>
+              <option value="R_100">Volatility 100 Index</option>
+              <option value="R_10H">Volatility 10 (1s) Index</option>
+              <option value="R_25H">Volatility 25 (1s) Index</option>
+              <option value="R_50H">Volatility 50 (1s) Index</option>
+              <option value="R_75H">Volatility 75 (1s) Index</option>
+              <option value="R_100H">Volatility 100 (1s) Index</option>
+              <option value="RDBULL">Bull Market Index</option>
+              <option value="RDBEAR">Bear Market Index</option>
+              <option value="RWM">Step Index</option>
+              <option value="RD10">Crash 1000 Index</option>
+              <option value="RD100">Crash 500 Index</option>
+              <option value="RDP10">Boom 1000 Index</option>
+              <option value="RDP100">Boom 500 Index</option>
     </select>
     <label>Ticks <input type="number" id="tickCount" value="1000"></label>
     <span class="price">PRICE 1701.69</span>
+    <!-- <input type="text" placeholder="Manual LDP">
+    <button>Upload</button>
+    <button>Download</button>
+    <button>Strategies</button>
+    <button onclick="toggleSmartAnalysis()">Smart Analysis</button> -->
   </div>
 
   <div class="grid-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="smartAnalysisSection">
@@ -470,7 +507,7 @@
           </select>
         </label>
         <div class="icon-button">
-          <button data-open-settings><i class="fas fa-sliders-h"></i></button>
+          <button data-open-settings><i class="fas fa-sliders-h"></i></button> <!-- Settings icon -->
           <button data-play_button data-contract="OVERUNDER"><i class="fas fa-play"></i></button>
         </div>
       </div>
@@ -505,7 +542,7 @@
           </select>
         </label>
         <div class="icon-button">
-          <button data-open-settings><i class="fas fa-sliders-h"></i></button>
+          <button data-open-settings><i class="fas fa-sliders-h"></i></button> <!-- Settings icon -->
           <button data-play_button data-contract="ODDEVEN"><i class="fas fa-play"></i></button>
         </div>
       </div>
@@ -541,35 +578,42 @@
           </select>
         </label>
         <div class="icon-button">
-          <button data-open-settings><i class="fas fa-sliders-h"></i></button>
+          <button data-open-settings><i class="fas fa-sliders-h"></i></button> <!-- Settings icon -->
           <button data-play_button data-contract="RISEFALL"><i class="fas fa-play"></i></button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Dialog (Settings Form) -->
   <div id="settingsDialog" class="dialog">
-    <div class="dialog-title">Bot Settings</div>
+    <div class="dialog-title">Bot Settings</div> <!-- Added title here -->
+
     <div class="form-group">
       <label for="ticks">Ticks: </label>
       <input type="number" id="ticksInput" placeholder="Enter ticks" value="1">
     </div>
+
     <div class="form-group">
       <label for="stake">Stake: </label>
       <input type="number" id="stakeInput" placeholder="Enter stake" value="1">
     </div>
+
     <div class="form-group">
       <label for="martingale">Martingale: </label>
       <input type="number" id="martingaleInput" placeholder="Enter martingale" value="1.20">
     </div>
+
     <br>
     <button id="save">Save</button>
   </div>
   
   <div id="slider"></div>
+
+
+
+  <!-- Snackbar (Notification) -->
   <div id="snackbar" class="snackbar">Settings saved successfully!</div>
  
-  <script src="config-bridge.js"></script>
-  <script src="analysis.js"></script>
 </body>
-</html> 
+</html>

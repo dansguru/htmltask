@@ -148,7 +148,7 @@ const AppWrapper = observer(() => {
     useEffect(() => {
         if (active_tour) {
             setTourDialogVisibility(false);
-            setActiveTour(false);
+            setActiveTour('');
         }
     }, [active_tab]);
 
@@ -171,7 +171,7 @@ const AppWrapper = observer(() => {
                         className='main__tabs'
                         onTabItemClick={handleTabChange}
                         top
-                        history={navigate}
+                        history={navigate as unknown as History}
                     >
                         <div
                             label={
@@ -217,7 +217,7 @@ const AppWrapper = observer(() => {
                             id='id-analysis-tool'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading Analysis Tool...' />}>
-                                <AnalysisTool />
+                                <AnalysisTool onTabChange={handleTabChange} />
                             </Suspense>
                         </div>
                         <div
@@ -234,7 +234,7 @@ const AppWrapper = observer(() => {
                             id='id-copy-trading'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading Copy Trading...' />}>
-                                <CopyTrading />
+                                <CopyTrading onTabChange={handleTabChange} />
                             </Suspense>
                         </div>
                         <div
@@ -250,8 +250,8 @@ const AppWrapper = observer(() => {
                             }
                             id='id-smart-analysis'
                         >
-                            <Suspense fallback={<ChunkLoader message={localize('Loading Smart Analysis...')} />}>
-                                <SmartAnalysis />
+                            <Suspense fallback={<ChunkLoader message='Loading Smart Analysis...' />}>
+                                <SmartAnalysis onTabChange={handleTabChange} />
                             </Suspense>
                         </div>
                         <div
@@ -271,7 +271,7 @@ const AppWrapper = observer(() => {
                                     : 'id-charts'
                             }
                         >
-                            <Suspense fallback={<ChunkLoader message={localize('Loading charts...')} />}>
+                            <Suspense fallback={<ChunkLoader message='Loading charts...' />}>
                                 <ChartWrapper show_digits_stats={false} />
                             </Suspense>
                         </div>
@@ -284,7 +284,7 @@ const AppWrapper = observer(() => {
                             }
                             id='id-tutorial'
                         >
-                            <Suspense fallback={<ChunkLoader message={localize('Loading tutorials...')} />}>
+                            <Suspense fallback={<ChunkLoader message='Loading tutorials...' />}>
                                 <Tutorial />
                             </Suspense>
                         </div>
@@ -322,7 +322,7 @@ const AppWrapper = observer(() => {
                 has_close_icon
                 is_mobile_full_width={false}
                 is_visible={is_dialog_open}
-                onCancel={onCancelButtonClick}
+                onCancel={onCancelButtonClick || undefined}
                 onClose={onCloseDialog}
                 onConfirm={onOkButtonClick || onCloseDialog}
                 portal_element_id='modal_root'

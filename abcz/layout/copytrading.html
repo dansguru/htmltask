@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CopyTrade Form</title>
+  <style>
+    .copytrade-wrapper {
+      background-color: #121212;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .copytrade-container {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+      width: 300px;
+    }
+
+    .copytrade-title {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .copytrade-title .copy {
+      color: white;
+    }
+
+    .copytrade-title .trade {
+      color: orange;
+    }
+
+    .copytrade-group {
+      margin-bottom: 15px;
+    }
+
+    .copytrade-label {
+      margin-bottom: 5px;
+      display: block;
+      color: #ccc;
+    }
+
+    .copytrade-readonly-box,
+    .copytrade-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #2c2c2c;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .copytrade-readonly-box {
+      border: 1px solid #444;
+      color: #aaa;
+    }
+
+    .copytrade-input {
+      border: 1px solid #444;
+      color: white;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .copytrade-input:focus {
+      box-shadow: 0 0 8px orange;
+      border-color: orange;
+    }
+
+    .copytrade-input::placeholder {
+      color: #888;
+    }
+
+    .copytrade-button {
+      background-color: orange;
+      color: #121212;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .copytrade-button:hover {
+      background-color: #e69500;
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: orange;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body>
+  <div class="copytrade-wrapper">
+    <div class="copytrade-container">
+      <div class="copytrade-title">
+        <span class="copy">Copy</span><span class="trade">Trade</span>
+      </div>
+
+      <div class="toggle-wrapper">
+        <label class="switch">
+          <input type="checkbox" id="copy-toggle">
+          <span class="slider"></span>
+        </label>
+        <span>Copy Trades from Demo to Real account</span>
+      </div>
+
+      <div class="copytrade-group">
+        <label class="copytrade-label">Account ID</label>
+        <div class="copytrade-readonly-box">12345678</div>
+      </div>
+
+      <div class="copytrade-group">
+        <label class="copytrade-label">Client Token</label>
+        <input class="copytrade-input" type="text" placeholder="Enter client token">
+      </div>
+
+      <button class="copytrade-button" type="button">Start Copy</button>
+
+    </div>
+  </div>
+</body>
+</html>

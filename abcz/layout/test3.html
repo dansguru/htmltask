@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deriv Bot Auto Auth</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #121212;
+      color: #fff;
+      font-family: sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    #status {
+      margin: 20px 0;
+      font-size: 18px;
+      color: #0f0;
+      text-align: center;
+    }
+
+    #dbot-iframe-wrapper {
+      display: none;
+      width: 100vw;
+      height: 600px;
+      max-width: 100%;
+      position: relative;
+      overflow: hidden;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="dbot-iframe-wrapper"></div>
+  <div id="status">🔍 Checking token...</div>
+
+  <script>
+    const app_id = '69913';
+
+    function getQueryParams() {
+      const params = {};
+      const queryString = window.location.search.substring(1);
+      const pairs = queryString.split('&');
+      for (const pair of pairs) {
+        const [key, value] = pair.split('=');
+        if (key && value) params[decodeURIComponent(key)] = decodeURIComponent(value);
+      }
+      return params;
+    }
+
+    function storeTokenFromURL() {
+      const params = getQueryParams();
+      if (params.token1) {
+        localStorage.setItem('active_token', params.token1);
+        localStorage.setItem('token_list', JSON.stringify([{ token: params.token1 }]));
+        console.log("✅ Token1 stored:", params.token1);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    function getActiveToken() {
+      const token = localStorage.getItem('active_token');
+      console.log("🧪 active_token in localStorage:", token);
+      return token;
+    }
+
+    function loadBot() {
+      const wrapper = document.getElementById('dbot-iframe-wrapper');
+      const token = getActiveToken();
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://dbot.deriv.com/?token1=${token}&app_id=${app_id}#bot_builder`;
+      iframe.allowFullscreen = true;
+
+      wrapper.innerHTML = '';
+      wrapper.appendChild(iframe);
+      wrapper.style.display = 'block';
+
+      document.getElementById('status').textContent = "✅ Token found. Loading bot...";
+    }
+
+    function redirectToLogin() {
+      const redirect_uri = encodeURIComponent(window.location.href);
+      const login_url = `https://oauth.deriv.com/oauth2/authorize?app_id=${app_id}&l=EN&redirect_uri=${redirect_uri}`;
+      console.log("🔁 Redirecting to login:", login_url);
+      document.getElementById('status').textContent = "🔁 Redirecting to Deriv login...";
+      window.location.href = login_url;
+    }
+
+    function init() {
+      storeTokenFromURL();
+      const token = getActiveToken();
+      if (token) {
+        loadBot();
+      } else {
+        redirectToLogin();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
