@@ -103,6 +103,8 @@ const AppWrapper = observer(() => {
         'freebots',
         'tools-hub',
         'smart-analysis',
+        'analysis-tool',
+        'copy-trading',
     ];
     const { isDesktop } = useDevice();
     const navigate = useNavigate();
@@ -214,7 +216,7 @@ const AppWrapper = observer(() => {
                             }
                             id='id-analysis-tool'
                         >
-                            <Suspense fallback={<ChunkLoader message={localize('Loading Analysis Tool...')} />}>
+                            <Suspense fallback={<ChunkLoader message='Loading Analysis Tool...' />}>
                                 <AnalysisTool />
                             </Suspense>
                         </div>
@@ -231,7 +233,7 @@ const AppWrapper = observer(() => {
                             }
                             id='id-copy-trading'
                         >
-                            <Suspense fallback={<ChunkLoader message={localize('Loading Copy Trading...')} />}>
+                            <Suspense fallback={<ChunkLoader message='Loading Copy Trading...' />}>
                                 <CopyTrading />
                             </Suspense>
                         </div>
