@@ -19,23 +19,41 @@ const CopyTrading = observer(({ onTabChange }: CopyTradingProps) => {
     useEffect(() => {
         const loadScripts = async () => {
             try {
+                console.log('Loading Copy Trading scripts...');
+                
                 // Load required scripts
                 const configScript = document.createElement('script');
-                configScript.src = '/htmltools/config-bridge.js';
+                configScript.src = `${window.location.origin}/htmltools/config-bridge.js`;
+                console.log('Loading config script from:', configScript.src);
                 document.body.appendChild(configScript);
 
+                const copyTradingScript = document.createElement('script');
+                copyTradingScript.src = `${window.location.origin}/htmltools/copytrading.js`;
+                console.log('Loading copy trading script from:', copyTradingScript.src);
+                document.body.appendChild(copyTradingScript);
+
                 // Load HTML content
-                const response = await fetch('/htmltools/copytrading.html');
+                const htmlUrl = `${window.location.origin}/htmltools/copytrading.html`;
+                console.log('Loading HTML content from:', htmlUrl);
+                const response = await fetch(htmlUrl);
+                
                 if (!response.ok) {
-                    throw new Error('Failed to load copy trading tool');
+                    throw new Error(`Failed to load copy trading tool: ${response.status} ${response.statusText}`);
                 }
+                
                 const content = await response.text();
+                console.log('HTML content loaded successfully');
+                
                 const container = document.getElementById('copy-trading-container');
                 if (container) {
                     container.innerHTML = content;
                     setIsLoading(false);
+                    console.log('Copy Trading loaded successfully');
+                } else {
+                    throw new Error('Container element not found');
                 }
             } catch (err) {
+                console.error('Error loading Copy Trading:', err);
                 setError(err instanceof Error ? err.message : 'An error occurred');
                 setIsLoading(false);
             }
@@ -44,7 +62,7 @@ const CopyTrading = observer(({ onTabChange }: CopyTradingProps) => {
         loadScripts();
 
         return () => {
-            // Cleanup scripts when component unmounts
+            console.log('Cleaning up Copy Trading scripts...');
             const scripts = document.querySelectorAll('script[src*="htmltools"]');
             scripts.forEach(script => script.remove());
         };

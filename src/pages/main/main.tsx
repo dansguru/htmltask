@@ -285,7 +285,7 @@ const AppWrapper = observer(() => {
                             id='id-tutorial'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading tutorials...' />}>
-                                <Tutorial />
+                                <Tutorial handleTabChange={handleTabChange} />
                             </Suspense>
                         </div>
                         <div

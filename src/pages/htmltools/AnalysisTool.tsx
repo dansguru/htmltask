@@ -19,27 +19,41 @@ const AnalysisTool = observer(({ onTabChange }: AnalysisToolProps) => {
     useEffect(() => {
         const loadScripts = async () => {
             try {
+                console.log('Loading Analysis Tool scripts...');
+                
                 // Load required scripts
                 const configScript = document.createElement('script');
-                configScript.src = '/htmltools/config-bridge.js';
+                configScript.src = `${window.location.origin}/htmltools/config-bridge.js`;
+                console.log('Loading config script from:', configScript.src);
                 document.body.appendChild(configScript);
 
                 const analysisScript = document.createElement('script');
-                analysisScript.src = '/htmltools/analysis.js';
+                analysisScript.src = `${window.location.origin}/htmltools/analysis.js`;
+                console.log('Loading analysis script from:', analysisScript.src);
                 document.body.appendChild(analysisScript);
 
                 // Load HTML content
-                const response = await fetch('/htmltools/analysis.html');
+                const htmlUrl = `${window.location.origin}/htmltools/analysis.html`;
+                console.log('Loading HTML content from:', htmlUrl);
+                const response = await fetch(htmlUrl);
+                
                 if (!response.ok) {
-                    throw new Error('Failed to load analysis tool');
+                    throw new Error(`Failed to load analysis tool: ${response.status} ${response.statusText}`);
                 }
+                
                 const content = await response.text();
+                console.log('HTML content loaded successfully');
+                
                 const container = document.getElementById('analysis-tool-container');
                 if (container) {
                     container.innerHTML = content;
                     setIsLoading(false);
+                    console.log('Analysis Tool loaded successfully');
+                } else {
+                    throw new Error('Container element not found');
                 }
             } catch (err) {
+                console.error('Error loading Analysis Tool:', err);
                 setError(err instanceof Error ? err.message : 'An error occurred');
                 setIsLoading(false);
             }
@@ -48,7 +62,7 @@ const AnalysisTool = observer(({ onTabChange }: AnalysisToolProps) => {
         loadScripts();
 
         return () => {
-            // Cleanup scripts when component unmounts
+            console.log('Cleaning up Analysis Tool scripts...');
             const scripts = document.querySelectorAll('script[src*="htmltools"]');
             scripts.forEach(script => script.remove());
         };

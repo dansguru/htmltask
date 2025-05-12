@@ -21,19 +21,19 @@ const SmartAnalysis = observer(({ onTabChange }: SmartAnalysisProps) => {
             try {
                 // Load required scripts
                 const configScript = document.createElement('script');
-                configScript.src = '/htmltools/config-bridge.js';
+                configScript.src = `${window.location.origin}/htmltools/config-bridge.js`;
                 document.body.appendChild(configScript);
 
                 const signalScript = document.createElement('script');
-                signalScript.src = '/htmltools/signal.js';
+                signalScript.src = `${window.location.origin}/htmltools/signal.js`;
                 document.body.appendChild(signalScript);
 
                 const analysisScript = document.createElement('script');
-                analysisScript.src = '/htmltools/analysis.js';
+                analysisScript.src = `${window.location.origin}/htmltools/analysis.js`;
                 document.body.appendChild(analysisScript);
 
                 // Load HTML content
-                const response = await fetch('/htmltools/signal.html');
+                const response = await fetch(`${window.location.origin}/htmltools/signal.html`);
                 if (!response.ok) {
                     throw new Error('Failed to load smart analysis tool');
                 }
