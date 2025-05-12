@@ -33,9 +33,8 @@ import ToolsHub from '../tools-hub';
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
 const SmartAnalysisTool = lazy(() => import('../SmartAnalysisTool/SmartAnalysisTool'));
-const AnalysisTool = lazy(() => import('../htmltools/AnalysisTool'));
-const CopyTrading = lazy(() => import('../htmltools/CopyTrading'));
-const SmartAnalysis = lazy(() => import('../htmltools/SmartAnalysis'));
+const AnalysisTool = lazy(() => import('../analysis-tool'));
+const CopyTrading = lazy(() => import('../copy-trading'));
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
     constructor(props: { children: React.ReactNode }) {
@@ -217,7 +216,7 @@ const AppWrapper = observer(() => {
                             id='id-analysis-tool'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading Analysis Tool...' />}>
-                                <AnalysisTool onTabChange={handleTabChange} />
+                                <AnalysisTool />
                             </Suspense>
                         </div>
                         <div
@@ -234,7 +233,7 @@ const AppWrapper = observer(() => {
                             id='id-copy-trading'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading Copy Trading...' />}>
-                                <CopyTrading onTabChange={handleTabChange} />
+                                <CopyTrading />
                             </Suspense>
                         </div>
                         <div
@@ -251,7 +250,7 @@ const AppWrapper = observer(() => {
                             id='id-smart-analysis'
                         >
                             <Suspense fallback={<ChunkLoader message='Loading Smart Analysis...' />}>
-                                <SmartAnalysis onTabChange={handleTabChange} />
+                                <SmartAnalysisTool />
                             </Suspense>
                         </div>
                         <div
