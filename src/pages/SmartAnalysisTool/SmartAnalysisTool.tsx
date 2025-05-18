@@ -1,28 +1,37 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { getAppId } from '@/components/shared/utils/config/config';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { setupABCZIframe } from '@/utils/abcz-auth';
+import { getAppId } from '@/components/shared/utils/config/config';
 import { useDevice } from '@deriv-com/ui';
 import './styles.css';
 
-const SmartAnalysisTool = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [appId, setAppId] = useState<string>('');
-    const { isAuthenticated, tokens } = useAuth();
+const SmartAnalysisTool: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const { isAuthenticated, tokens } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [appId, setAppId] = useState<string | null>(null);
     const { isMobile } = useDevice();
 
     useEffect(() => {
-        const app_id = getAppId();
-        setAppId(String(app_id));
+        const fetchAppId = async () => {
+            try {
+                const id = await getAppId();
+                setAppId(String(id));
+            } catch (err) {
+                setError('Failed to load application ID');
+                console.error('Error fetching app ID:', err);
+            }
+        };
+        fetchAppId();
     }, []);
 
     useEffect(() => {
-        if (iframeRef.current) {
+        if (iframeRef.current && appId) {
             setupABCZIframe(iframeRef.current);
+            setLoading(false);
         }
-    }, []);
+    }, [appId]);
 
     if (!isAuthenticated) {
         return (
@@ -33,16 +42,23 @@ const SmartAnalysisTool = () => {
         );
     }
 
+    if (loading) {
+        return <div className="loading">Loading Smart Analysis Tool...</div>;
+    }
+
+    if (error) {
+        return <div className="error">{error}</div>;
+    }
+
     return (
-        <div className="smart-analysis-wrapper">
-            {error && <div className="error-message">{error}</div>}
-            {isLoading && <div className="loading">Loading Smart Analysis Tool...</div>}
+        <div className="smart-analysis-container">
             <iframe
                 ref={iframeRef}
-                src={`/abcz/layout/analysis.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`https://smart-analysis.abcz.com?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
                 className="smart-analysis-iframe"
-                onLoad={() => setIsLoading(false)}
-                onError={() => setError('Failed to load Smart Analysis Tool')}
+                title="Smart Analysis Tool"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
                 style={{
                     width: '100%',
                     height: isMobile ? 'calc(100vh - 96px)' : 'calc(100vh - 48px)',
