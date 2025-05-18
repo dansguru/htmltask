@@ -2,17 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { setupABCZIframe } from '@/utils/abcz-auth';
 import { getAppId } from '@/components/shared/utils/config/config';
-import LoginButton from '@/components/shared/LoginButton';
-import '@/components/shared/LoginButton.css';
 import './styles.css';
 
 const Signal: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const { isAuthenticated, tokens, login } = useAuth();
+    const { isAuthenticated, tokens } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [appId, setAppId] = useState<string | null>(null);
-    const [showLoginOverlay, setShowLoginOverlay] = useState(false);
 
     useEffect(() => {
         const fetchAppId = async () => {
@@ -31,30 +28,11 @@ const Signal: React.FC = () => {
         if (iframeRef.current && appId) {
             const cleanup = setupABCZIframe(iframeRef.current);
             setLoading(false);
-            
-            // Listen for auth events
-            const handleAuthRequired = () => {
-                setShowLoginOverlay(true);
-            };
-            
-            document.addEventListener('abcz_auth_required', handleAuthRequired);
-            
             return () => {
                 cleanup?.();
-                document.removeEventListener('abcz_auth_required', handleAuthRequired);
             };
         }
     }, [appId]);
-
-    if (!isAuthenticated) {
-        return (
-            <div className="auth-required">
-                <h2>Authentication Required</h2>
-                <p>Please log in to use the Signal Trader.</p>
-                <LoginButton />
-            </div>
-        );
-    }
 
     if (loading) {
         return <div className="loading">Loading Signal Trader...</div>;
@@ -66,13 +44,6 @@ const Signal: React.FC = () => {
 
     return (
         <div className="signal-container">
-            {showLoginOverlay && (
-                <div className="auth-required-overlay">
-                    <h2>Session Expired</h2>
-                    <p>Your session has expired or you have been logged out. Please log in again to continue using the Signal Trader.</p>
-                    <LoginButton />
-                </div>
-            )}
             <iframe
                 ref={iframeRef}
                 src={`/abcz/layout/signal.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}

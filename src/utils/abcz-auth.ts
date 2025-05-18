@@ -34,13 +34,9 @@ export const initializeABCZAuth = () => {
                 }, { targetOrigin: '*' });
             }
         } else if (type === 'ABCZ_LOGIN_REQUEST') {
-            // Trigger login flow
-            const app_id = localStorage.getItem('config.app_id') || getAppIdFromConfig();
-            
-            // Store current path to redirect back after login
-            sessionStorage.setItem('redirect_after_login', window.location.href);
-            
-            window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${app_id}`;
+            // Trigger auth required event for AuthWrapper to handle
+            const authRequiredEvent = new Event('abcz_auth_required');
+            document.dispatchEvent(authRequiredEvent);
         } else if (type === 'ABCZ_LOGOUT') {
             // Clear auth data and reload
             localStorage.removeItem('tokens');
@@ -168,12 +164,7 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
                 console.error("Error parsing tokens during iframe setup:", e);
             }
         } else {
-            // Send auth required message if no tokens
-            iframe.contentWindow.postMessage({
-                type: 'ABCZ_AUTH_REQUIRED'
-            }, { targetOrigin: '*' });
-            
-            // Trigger a custom event that components can listen for
+            // Trigger auth required event for AuthWrapper to handle
             const authRequiredEvent = new Event('abcz_auth_required');
             document.dispatchEvent(authRequiredEvent);
         }
@@ -212,6 +203,10 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
             event.data?.type === 'logout' ||
             event.data?.authorize) {
             sendAuthStateToIframe(iframe);
+        } else if (event.data?.type === 'ABCZ_LOGIN_REQUEST') {
+            // Trigger auth required event for AuthWrapper to handle
+            const authRequiredEvent = new Event('abcz_auth_required');
+            document.dispatchEvent(authRequiredEvent);
         }
     };
     

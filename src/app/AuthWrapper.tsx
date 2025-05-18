@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ChunkLoader from '@/components/loader/chunk-loader';
 import { generateDerivApiInstance } from '@/external/bot-skeleton/services/api/appId';
 import { localize } from '@deriv-com/translations';
@@ -34,6 +34,12 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
                     if (filteredTokens.length) {
                         localStorage.setItem('authToken', filteredTokens[0].token);
                         localStorage.setItem('active_loginid', filteredTokens[0].loginid);
+                        // Also set tokens in the format expected by the AuthContext
+                        const tokensObject = filteredTokens.reduce((acc, token) => {
+                            acc[token.loginid] = token.token;
+                            return acc;
+                        }, {} as Record<string, string>);
+                        localStorage.setItem('tokens', JSON.stringify(tokensObject));
                         return;
                     }
                 }
@@ -41,25 +47,93 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
 
             localStorage.setItem('authToken', loginInfo[0].token);
             localStorage.setItem('active_loginid', loginInfo[0].loginid);
+            
+            // Also set tokens in the format expected by the AuthContext
+            const tokensObject = loginInfo.reduce((acc, token) => {
+                acc[token.loginid] = token.token;
+                return acc;
+            }, {} as Record<string, string>);
+            localStorage.setItem('tokens', JSON.stringify(tokensObject));
         } catch (error) {
             console.error('Error setting up login info:', error);
         }
     }
 };
 
+// Utility function to initiate login with Deriv
+const initiateLogin = () => {
+    const app_id = localStorage.getItem('config.app_id') || '76128';
+    
+    // Store current path to redirect back after login
+    sessionStorage.setItem('redirect_after_login', window.location.href);
+    
+    // Also store in localStorage for cross-tab awareness
+    localStorage.setItem('login_initiated', 'true');
+    localStorage.setItem('login_initiated_at', Date.now().toString());
+    
+    window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${app_id}`;
+};
+
 export const AuthWrapper = () => {
     const [isAuthComplete, setIsAuthComplete] = React.useState(false);
     const { loginInfo, paramsToDelete } = URLUtils.getLoginInfoFromURL();
 
-    React.useEffect(() => {
-        const initializeAuth = async () => {
-            await setLocalStorageToken(loginInfo, paramsToDelete);
-            URLUtils.filterSearchParams(['lang']);
-            setIsAuthComplete(true);
+    // Check if we need to auto-login user
+    useEffect(() => {
+        const checkAuthStatus = () => {
+            const tokensStr = localStorage.getItem('tokens');
+            const authToken = localStorage.getItem('authToken');
+            const activeLoginId = localStorage.getItem('active_loginid');
+            
+            // If we don't have any auth data and not coming from a redirect
+            if ((!tokensStr || !activeLoginId) && (!authToken || !activeLoginId) && !loginInfo.length) {
+                // Check if we're on a page that requires auth
+                const currentHash = window.location.hash.substring(1);
+                const authRequiredPages = [
+                    'smart-analysis', 'analysis-tool', 'copy-trading', 
+                    'ai-bot', 'signal'
+                ];
+                
+                if (authRequiredPages.some(page => currentHash.includes(page))) {
+                    console.log("Authentication required for this page, initiating login...");
+                    initiateLogin();
+                    return false;
+                }
+            }
+            return true;
         };
 
-        initializeAuth();
+        // Only proceed with initialization if we don't need to auto-login
+        if (checkAuthStatus()) {
+            // Normal initialization logic continues
+            const initializeAuth = async () => {
+                await setLocalStorageToken(loginInfo, paramsToDelete);
+                URLUtils.filterSearchParams(['lang']);
+                
+                // Broadcast the auth state to any tools that need it
+                const event = new Event('auth_state_updated');
+                document.dispatchEvent(event);
+                
+                setIsAuthComplete(true);
+            };
+            
+            initializeAuth();
+        }
     }, [loginInfo, paramsToDelete]);
+
+    // Listen for auth required events
+    useEffect(() => {
+        const handleAuthRequired = () => {
+            console.log("Auth required event received, initiating login...");
+            initiateLogin();
+        };
+        
+        document.addEventListener('abcz_auth_required', handleAuthRequired);
+        
+        return () => {
+            document.removeEventListener('abcz_auth_required', handleAuthRequired);
+        };
+    }, []);
 
     if (!isAuthComplete) {
         return <ChunkLoader message={localize('Initializing...')} />;

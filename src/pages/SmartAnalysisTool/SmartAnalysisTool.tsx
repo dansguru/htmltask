@@ -3,18 +3,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { setupABCZIframe } from '@/utils/abcz-auth';
 import { getAppId } from '@/components/shared/utils/config/config';
 import { useDevice } from '@deriv-com/ui';
-import LoginButton from '@/components/shared/LoginButton';
-import '@/components/shared/LoginButton.css';
 import './styles.css';
 
 const SmartAnalysisTool: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const { isAuthenticated, tokens, login } = useAuth();
+    const { isAuthenticated, tokens } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [appId, setAppId] = useState<string | null>(null);
     const { isMobile } = useDevice();
-    const [showLoginOverlay, setShowLoginOverlay] = useState(false);
 
     useEffect(() => {
         const fetchAppId = async () => {
@@ -33,30 +30,11 @@ const SmartAnalysisTool: React.FC = () => {
         if (iframeRef.current && appId) {
             const cleanup = setupABCZIframe(iframeRef.current);
             setLoading(false);
-            
-            // Listen for auth events
-            const handleAuthRequired = () => {
-                setShowLoginOverlay(true);
-            };
-            
-            document.addEventListener('abcz_auth_required', handleAuthRequired);
-            
             return () => {
                 cleanup();
-                document.removeEventListener('abcz_auth_required', handleAuthRequired);
             };
         }
     }, [appId]);
-
-    if (!isAuthenticated) {
-        return (
-            <div className="auth-required">
-                <h2>Authentication Required</h2>
-                <p>Please log in to use the Smart Analysis Tool.</p>
-                <LoginButton />
-            </div>
-        );
-    }
 
     if (loading) {
         return <div className="loading">Loading Smart Analysis Tool...</div>;
@@ -68,13 +46,6 @@ const SmartAnalysisTool: React.FC = () => {
 
     return (
         <div className="smart-analysis-container">
-            {showLoginOverlay && (
-                <div className="auth-required-overlay">
-                    <h2>Session Expired</h2>
-                    <p>Your session has expired or you have been logged out. Please log in again to continue using the Smart Analysis Tool.</p>
-                    <LoginButton />
-                </div>
-            )}
             <iframe
                 ref={iframeRef}
                 src={`/abcz/layout/analysis.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
