@@ -2,14 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { setupABCZIframe } from '@/utils/abcz-auth';
 import { getAppId } from '@/components/shared/utils/config/config';
+import LoginButton from '@/components/shared/LoginButton';
+import '@/components/shared/LoginButton.css';
 import './styles.css';
 
 const AIBot: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const { isAuthenticated, tokens } = useAuth();
+    const { isAuthenticated, tokens, login } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [appId, setAppId] = useState<string | null>(null);
+    const [showLoginOverlay, setShowLoginOverlay] = useState(false);
 
     useEffect(() => {
         const fetchAppId = async () => {
@@ -26,8 +29,20 @@ const AIBot: React.FC = () => {
 
     useEffect(() => {
         if (iframeRef.current && appId) {
-            setupABCZIframe(iframeRef.current);
+            const cleanup = setupABCZIframe(iframeRef.current);
             setLoading(false);
+            
+            // Listen for auth events
+            const handleAuthRequired = () => {
+                setShowLoginOverlay(true);
+            };
+            
+            document.addEventListener('abcz_auth_required', handleAuthRequired);
+            
+            return () => {
+                cleanup?.();
+                document.removeEventListener('abcz_auth_required', handleAuthRequired);
+            };
         }
     }, [appId]);
 
@@ -36,6 +51,7 @@ const AIBot: React.FC = () => {
             <div className="auth-required">
                 <h2>Authentication Required</h2>
                 <p>Please log in to use the AI Bot.</p>
+                <LoginButton />
             </div>
         );
     }
@@ -50,6 +66,13 @@ const AIBot: React.FC = () => {
 
     return (
         <div className="ai-bot-container">
+            {showLoginOverlay && (
+                <div className="auth-required-overlay">
+                    <h2>Session Expired</h2>
+                    <p>Your session has expired or you have been logged out. Please log in again to continue using the AI Bot.</p>
+                    <LoginButton />
+                </div>
+            )}
             <iframe
                 ref={iframeRef}
                 src={`/abcz/layout/thebot.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}

@@ -24,6 +24,16 @@ export const initializeABCZAuth = () => {
                     }
                 }, { targetOrigin: event.origin });
             }
+        } else if (type === 'ABCZ_LOGIN_REQUEST') {
+            // Trigger login flow
+            const app_id = localStorage.getItem('config.app_id') || "76128";
+            window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${app_id}`;
+        } else if (type === 'ABCZ_LOGOUT') {
+            // Clear auth data and reload
+            localStorage.removeItem('tokens');
+            localStorage.removeItem('active_loginid');
+            localStorage.removeItem('client_id');
+            window.location.reload();
         }
     });
 };
@@ -86,6 +96,15 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
                     login_id: activeLoginId,
                     client_id: clientId
                 }, window.location.origin);
+            } else {
+                // Send auth required message if tokens are removed
+                iframe.contentWindow.postMessage({
+                    type: 'ABCZ_AUTH_REQUIRED'
+                }, window.location.origin);
+                
+                // Trigger a custom event that components can listen for
+                const authRequiredEvent = new Event('abcz_auth_required');
+                document.dispatchEvent(authRequiredEvent);
             }
         }
     };

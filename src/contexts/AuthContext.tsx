@@ -7,6 +7,7 @@ interface AuthContextType {
     activeLoginId: string;
     setTokens: (tokens: string[]) => void;
     setActiveLoginId: (loginId: string) => void;
+    login: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,6 +16,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [tokens, setTokens] = useState<string[]>([]);
     const [activeLoginId, setActiveLoginId] = useState('');
+
+    const login = () => {
+        const app_id = getAppId();
+        window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${app_id}`;
+    };
 
     useEffect(() => {
         // Check for existing tokens in localStorage
@@ -125,7 +131,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             tokens,
             activeLoginId,
             setTokens,
-            setActiveLoginId
+            setActiveLoginId,
+            login
         }}>
             {children}
         </AuthContext.Provider>

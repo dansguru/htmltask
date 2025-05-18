@@ -1,0 +1,71 @@
+.deriv-login-button {
+    background-color: #ff444f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    margin-top: 16px;
+}
+
+.deriv-login-button:hover {
+    background-color: #e03039;
+}
+
+.auth-required {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    margin: 20px;
+}
+
+.auth-required h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.auth-required p {
+    font-size: 16px;
+    margin-bottom: 24px;
+    color: #666;
+    max-width: 500px;
+}
+
+.auth-required-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.auth-required-overlay h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.auth-required-overlay p {
+    font-size: 16px;
+    margin-bottom: 24px;
+    color: #666;
+    max-width: 500px;
+    text-align: center;
+} 
