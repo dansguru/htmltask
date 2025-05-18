@@ -124,26 +124,44 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
     // Create a broadcast channel for cross-tool communication
     const broadcastChannel = new BroadcastChannel('deriv_auth_channel');
     
+    console.log('setupABCZIframe: Starting iframe setup');
+    
     // Create cleanup function for event listeners
     const cleanupFns: (() => void)[] = [];
     
     // Add event listener for iframe load
     const onLoad = () => {
+        console.log('setupABCZIframe: iframe loaded');
         sendAuthStateToIframe(iframe);
     };
     
     // Function to send auth state to a specific iframe
     const sendAuthStateToIframe = (iframe: HTMLIFrameElement) => {
-        if (!iframe.contentWindow) return;
+        if (!iframe.contentWindow) {
+            console.error('setupABCZIframe: No contentWindow available');
+            return;
+        }
+        
+        console.log('setupABCZIframe: Sending auth state to iframe');
         
         // Send initial auth state
         const tokens = localStorage.getItem('tokens');
+        const authToken = localStorage.getItem('authToken');
         const clientId = localStorage.getItem('client_id');
         const activeLoginId = localStorage.getItem('active_loginid');
 
+        console.log('setupABCZIframe: Auth data:', { 
+            hasTokens: !!tokens, 
+            hasAuthToken: !!authToken,
+            hasClientId: !!clientId, 
+            hasActiveLoginId: !!activeLoginId 
+        });
+
+        // First check the new format
         if (tokens && (clientId || activeLoginId)) {
             try {
                 const tokensObj = JSON.parse(tokens);
+                console.log('setupABCZIframe: Sending tokens object to iframe');
                 
                 iframe.contentWindow.postMessage({
                     type: 'ABCZ_AUTH_RESPONSE',
@@ -152,22 +170,58 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
                         clientId,
                         activeLoginId
                     }
-                }, { targetOrigin: '*' });
+                }, '*');
                 
                 // Also simulate the format used in dashboard.js for compatibility
                 iframe.contentWindow.postMessage({
                     authorize: tokensObj,
                     login_id: activeLoginId,
                     client_id: clientId
-                }, { targetOrigin: '*' });
+                }, '*');
+                
+                return;
             } catch (e) {
                 console.error("Error parsing tokens during iframe setup:", e);
             }
-        } else {
-            // Trigger auth required event for AuthWrapper to handle
-            const authRequiredEvent = new Event('abcz_auth_required');
-            document.dispatchEvent(authRequiredEvent);
         }
+        
+        // Then try the legacy format as fallback
+        if (authToken && activeLoginId) {
+            try {
+                console.log('setupABCZIframe: Using legacy token format');
+                
+                // Create compatible tokens object
+                const tokensObj: Record<string, string> = {};
+                tokensObj[activeLoginId] = authToken;
+                
+                iframe.contentWindow.postMessage({
+                    type: 'ABCZ_AUTH_RESPONSE',
+                    data: { 
+                        tokens: tokensObj,
+                        clientId: activeLoginId,
+                        activeLoginId
+                    }
+                }, '*');
+                
+                // Also simulate the format used in dashboard.js for compatibility
+                iframe.contentWindow.postMessage({
+                    authorize: tokensObj,
+                    login_id: activeLoginId,
+                    client_id: activeLoginId
+                }, '*');
+                
+                return;
+            } catch (e) {
+                console.error("Error sending legacy tokens to iframe:", e);
+            }
+        }
+        
+        // If we got here, we don't have valid auth data
+        console.log('setupABCZIframe: No valid auth data found, triggering auth required event');
+        
+        // Trigger auth required event for AuthWrapper to handle
+        const authRequiredEvent = new Event('abcz_auth_required');
+        document.dispatchEvent(authRequiredEvent);
     };
     
     iframe.addEventListener('load', onLoad);
@@ -175,7 +229,8 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
 
     // Listen for auth changes in localStorage
     const handleStorageChange = (e: StorageEvent) => {
-        if ((e.key === 'tokens' || e.key === 'client_id' || e.key === 'active_loginid')) {
+        if ((e.key === 'tokens' || e.key === 'client_id' || e.key === 'active_loginid' || e.key === 'authToken')) {
+            console.log('setupABCZIframe: Auth storage changed, updating iframe');
             sendAuthStateToIframe(iframe);
             
             // Also notify other components via broadcast
@@ -189,6 +244,7 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
     // Listen for broadcast messages
     const handleBroadcastMessage = (event: MessageEvent) => {
         if (event.data?.type === 'auth_update') {
+            console.log('setupABCZIframe: Received auth update broadcast');
             sendAuthStateToIframe(iframe);
         }
     };
@@ -198,6 +254,8 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
     
     // Also listen for auth-related window messages
     const handleWindowMessage = (event: MessageEvent) => {
+        console.log('setupABCZIframe: Received window message', event.data?.type);
+        
         if (event.data?.type === 'auth' || 
             event.data?.type === 'login' || 
             event.data?.type === 'logout' ||
@@ -205,6 +263,7 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
             sendAuthStateToIframe(iframe);
         } else if (event.data?.type === 'ABCZ_LOGIN_REQUEST') {
             // Trigger auth required event for AuthWrapper to handle
+            console.log('setupABCZIframe: Received login request from iframe');
             const authRequiredEvent = new Event('abcz_auth_required');
             document.dispatchEvent(authRequiredEvent);
         }
@@ -214,10 +273,12 @@ export const setupABCZIframe = (iframe: HTMLIFrameElement) => {
     cleanupFns.push(() => window.removeEventListener('message', handleWindowMessage));
     
     // Send auth state immediately
+    console.log('setupABCZIframe: Sending initial auth state');
     setTimeout(() => sendAuthStateToIframe(iframe), 100);
 
     // Return cleanup function to remove event listeners
     return () => {
+        console.log('setupABCZIframe: Cleaning up listeners');
         cleanupFns.forEach(fn => fn());
     };
 }; 

@@ -27,12 +27,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // This effect runs only once on mount to check for previous login
     useEffect(() => {
+        console.log('AuthContext: Initial check for OAuth redirect');
         // Check for redirect from OAuth
         const url = new URL(window.location.href);
         const code = url.searchParams.get('code');
         const state = url.searchParams.get('state');
         
         if (code) {
+            console.log('AuthContext: OAuth code found in URL');
             // We have a successful OAuth redirect, store it
             localStorage.setItem('deriv_auth_code', code);
             
@@ -49,19 +51,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     useEffect(() => {
+        console.log('AuthContext: Checking existing authentication');
         // Check for existing tokens in localStorage
         const checkAuth = () => {
             const storedTokens = localStorage.getItem('tokens');
             const activeLoginId = localStorage.getItem('active_loginid');
             const clientId = localStorage.getItem('client_id');
+            const authToken = localStorage.getItem('authToken');
             
             // Debug info
-            console.log("Auth check:", { storedTokens: !!storedTokens, activeLoginId: !!activeLoginId, clientId: !!clientId });
+            console.log("Auth check:", { 
+                storedTokens: !!storedTokens, 
+                activeLoginId: !!activeLoginId, 
+                clientId: !!clientId,
+                authToken: !!authToken
+            });
             
+            // Try new format tokens first
             if (storedTokens && (clientId || activeLoginId)) {
                 try {
                     const tokensObj = JSON.parse(storedTokens);
                     const tokensArray = Object.values(tokensObj).map(token => String(token));
+                    console.log('AuthContext: Setting tokens from stored tokens object', tokensArray.length);
                     setTokens(tokensArray);
                     setIsAuthenticated(true);
                     if (activeLoginId) {
@@ -70,20 +81,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     
                     // Broadcast auth state to any ABCZ iframes in the page
                     broadcastAuthState(tokensObj, clientId, activeLoginId);
+                    setAuthChecked(true);
+                    return;
                 } catch (error) {
                     console.error('Error parsing tokens:', error);
-                    setIsAuthenticated(false);
                 }
-            } else {
-                setTokens([]);
-                setIsAuthenticated(false);
             }
             
+            // Try legacy authToken as fallback
+            if (authToken && activeLoginId) {
+                try {
+                    console.log('AuthContext: Setting token from authToken');
+                    setTokens([authToken]);
+                    setIsAuthenticated(true);
+                    setActiveLoginId(activeLoginId);
+                    
+                    // Create compatible tokens format and store it
+                    const tokensObj: Record<string, string> = {};
+                    tokensObj[activeLoginId] = authToken;
+                    localStorage.setItem('tokens', JSON.stringify(tokensObj));
+                    
+                    // Broadcast auth state
+                    broadcastAuthState(tokensObj, activeLoginId, activeLoginId);
+                    setAuthChecked(true);
+                    return;
+                } catch (error) {
+                    console.error('Error handling legacy token:', error);
+                }
+            }
+            
+            console.log('AuthContext: No valid tokens found');
+            setTokens([]);
+            setIsAuthenticated(false);
             setAuthChecked(true);
         };
         
         // Broadcast authentication state to all iframes
         const broadcastAuthState = (tokensObj: any, clientId: string | null, activeLoginId: string | null) => {
+            console.log('AuthContext: Broadcasting auth state to iframes');
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach(iframe => {
                 if (iframe.contentWindow) {
@@ -111,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Listen for auth changes from Deriv
         const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === 'tokens' || e.key === 'active_loginid' || e.key === 'client_id') {
+            if (e.key === 'tokens' || e.key === 'active_loginid' || e.key === 'client_id' || e.key === 'authToken') {
                 console.log("Storage change detected:", e.key);
                 checkAuth();
             }
@@ -193,6 +228,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         }
     }, [authChecked, isAuthenticated]);
+
+    console.log('AuthContext rendering with:', { isAuthenticated, tokensCount: tokens.length, activeLoginId, authChecked });
 
     return (
         <AuthContext.Provider value={{

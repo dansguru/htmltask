@@ -13,11 +13,17 @@ const SmartAnalysisTool: React.FC = () => {
     const [appId, setAppId] = useState<string | null>(null);
     const { isMobile } = useDevice();
 
+    // Debug auth state
+    useEffect(() => {
+        console.log('SmartAnalysisTool: Auth state', { isAuthenticated, tokensExist: !!tokens, tokensLength: tokens?.length });
+    }, [isAuthenticated, tokens]);
+
     useEffect(() => {
         const fetchAppId = async () => {
             try {
                 const id = await getAppId();
                 setAppId(String(id));
+                console.log('SmartAnalysisTool: AppId fetched', id);
             } catch (err) {
                 setError('Failed to load application ID');
                 console.error('Error fetching app ID:', err);
@@ -28,15 +34,18 @@ const SmartAnalysisTool: React.FC = () => {
 
     useEffect(() => {
         if (iframeRef.current && appId) {
+            console.log('SmartAnalysisTool: Setting up iframe with appId', appId);
             const cleanup = setupABCZIframe(iframeRef.current);
             setLoading(false);
             return () => {
+                console.log('SmartAnalysisTool: Cleaning up iframe');
                 cleanup();
             };
         }
     }, [appId]);
 
     if (loading) {
+        console.log('SmartAnalysisTool: Still loading...', { appId, hasIframe: !!iframeRef.current });
         return <div className="loading">Loading Smart Analysis Tool...</div>;
     }
 
@@ -44,11 +53,12 @@ const SmartAnalysisTool: React.FC = () => {
         return <div className="error">{error}</div>;
     }
 
+    console.log('SmartAnalysisTool: Rendering iframe with tokens', tokens);
     return (
         <div className="smart-analysis-container">
             <iframe
                 ref={iframeRef}
-                src={`/abcz/layout/analysis.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`/abcz/layout/analysis.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens || []))}`}
                 className="smart-analysis-iframe"
                 title="Smart Analysis Tool"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

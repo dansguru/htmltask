@@ -6,6 +6,8 @@ import { URLUtils } from '@deriv-com/utils';
 import App from './App';
 
 const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDelete: string[]) => {
+    console.log('AuthWrapper.setLocalStorageToken: Starting with loginInfo', { count: loginInfo.length });
+    
     if (loginInfo.length) {
         try {
             const defaultActiveAccount = URLUtils.getDefaultActiveAccount(loginInfo);
@@ -19,6 +21,10 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
                 clientAccounts[account.loginid] = account;
             });
 
+            console.log('AuthWrapper: Storing tokens in localStorage', { 
+                loginIds: Object.keys(accountsList).length
+            });
+            
             localStorage.setItem('accountsList', JSON.stringify(accountsList));
             localStorage.setItem('clientAccounts', JSON.stringify(clientAccounts));
 
@@ -32,6 +38,7 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
                     const firstId = authorize?.account_list[0]?.loginid;
                     const filteredTokens = loginInfo.filter(token => token.loginid === firstId);
                     if (filteredTokens.length) {
+                        console.log('AuthWrapper: Setting auth tokens from successful authorization');
                         localStorage.setItem('authToken', filteredTokens[0].token);
                         localStorage.setItem('active_loginid', filteredTokens[0].loginid);
                         // Also set tokens in the format expected by the AuthContext
@@ -45,6 +52,7 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
                 }
             }
 
+            console.log('AuthWrapper: Setting auth tokens without validation');
             localStorage.setItem('authToken', loginInfo[0].token);
             localStorage.setItem('active_loginid', loginInfo[0].loginid);
             
@@ -64,6 +72,8 @@ const setLocalStorageToken = async (loginInfo: URLUtils.LoginInfo[], paramsToDel
 const initiateLogin = () => {
     const app_id = localStorage.getItem('config.app_id') || '76128';
     
+    console.log('AuthWrapper.initiateLogin: Starting login flow with app_id', app_id);
+    
     // Store current path to redirect back after login
     sessionStorage.setItem('redirect_after_login', window.location.href);
     
@@ -78,12 +88,24 @@ export const AuthWrapper = () => {
     const [isAuthComplete, setIsAuthComplete] = React.useState(false);
     const { loginInfo, paramsToDelete } = URLUtils.getLoginInfoFromURL();
 
+    console.log('AuthWrapper: Initializing with', { 
+        hasLoginInfo: loginInfo.length > 0,
+        isAuthComplete
+    });
+
     // Check if we need to auto-login user
     useEffect(() => {
         const checkAuthStatus = () => {
             const tokensStr = localStorage.getItem('tokens');
             const authToken = localStorage.getItem('authToken');
             const activeLoginId = localStorage.getItem('active_loginid');
+            
+            console.log('AuthWrapper.checkAuthStatus: Checking auth status', { 
+                hasTokensStr: !!tokensStr, 
+                hasAuthToken: !!authToken, 
+                hasActiveLoginId: !!activeLoginId, 
+                hasLoginInfo: loginInfo.length > 0
+            });
             
             // If we don't have any auth data and not coming from a redirect
             if ((!tokensStr || !activeLoginId) && (!authToken || !activeLoginId) && !loginInfo.length) {
@@ -107,8 +129,26 @@ export const AuthWrapper = () => {
         if (checkAuthStatus()) {
             // Normal initialization logic continues
             const initializeAuth = async () => {
-                await setLocalStorageToken(loginInfo, paramsToDelete);
+                if (loginInfo.length > 0) {
+                    console.log('AuthWrapper: Has login info from URL, setting up tokens');
+                    await setLocalStorageToken(loginInfo, paramsToDelete);
+                } else {
+                    console.log('AuthWrapper: No login info from URL');
+                }
+                
                 URLUtils.filterSearchParams(['lang']);
+                
+                // Check if we have the legacy authToken but no tokens in new format
+                const authToken = localStorage.getItem('authToken');
+                const activeLoginId = localStorage.getItem('active_loginid');
+                const tokens = localStorage.getItem('tokens');
+                
+                if (authToken && activeLoginId && !tokens) {
+                    console.log('AuthWrapper: Converting legacy token format to new format');
+                    const tokensObject: Record<string, string> = {};
+                    tokensObject[activeLoginId] = authToken;
+                    localStorage.setItem('tokens', JSON.stringify(tokensObject));
+                }
                 
                 // Broadcast the auth state to any tools that need it
                 const event = new Event('auth_state_updated');
