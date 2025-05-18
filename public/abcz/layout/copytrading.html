@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <title>CopyTrade Form</title>
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
     .copytrade-wrapper {
       background-color: #121212;
       font-family: Arial, sans-serif;
@@ -11,16 +18,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
-
     .copytrade-container {
       background-color: #1e1e1e;
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
-      width: 300px;
+      width: 100%;
+      max-width: 400px;
     }
 
     .copytrade-title {
@@ -177,6 +186,46 @@
 
     </div>
   </div>
+  <script>
+    // Get app_id from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const app_id = urlParams.get('app_id') || '71916'; // Default to production app_id if not provided
+    window.DERIV_APP_ID = app_id; // Make app_id available to analysis.js
+
+    // Initialize WebSocket connection
+    const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${app_id}&l=EN&brand=deriv`);
+
+    ws.onopen = () => {
+        console.log('WebSocket connected');
+        // Subscribe to account updates
+        ws.send(JSON.stringify({
+            balance: 1,
+            subscribe: 1
+        }));
+    };
+
+    ws.onmessage = (msg) => {
+        const data = JSON.parse(msg.data);
+        if (data.balance) {
+            // Update account ID display
+            document.querySelector('.copytrade-readonly-box').textContent = data.balance.loginid;
+        }
+    };
+
+    // Handle copy trading toggle
+    document.getElementById('copy-toggle').addEventListener('change', function(e) {
+        const isEnabled = e.target.checked;
+        // Implement copy trading logic here
+    });
+
+    // Handle start copy button
+    document.querySelector('.copytrade-button').addEventListener('click', function() {
+        const clientToken = document.querySelector('.copytrade-input').value;
+        if (clientToken) {
+            // Implement copy trading start logic here
+        }
+    });
+  </script>
   <script src="js/analysis.js"></script>
 </body>
 </html>

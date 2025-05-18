@@ -28,6 +28,7 @@ import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
 import FreeBots from '../free-bots';
 import ToolsHub from '../tools-hub';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 // Lazy-loaded components
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
@@ -35,6 +36,8 @@ const Tutorial = lazy(() => import('../tutorials'));
 const SmartAnalysisTool = lazy(() => import('../SmartAnalysisTool/SmartAnalysisTool'));
 const AnalysisTool = lazy(() => import('../analysis-tool'));
 const CopyTrading = lazy(() => import('../copy-trading'));
+const Signal = lazy(() => import('../signal'));
+const AIBot = lazy(() => import('../ai-bot'));
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
     constructor(props: { children: React.ReactNode }) {
@@ -97,13 +100,15 @@ const AppWrapper = observer(() => {
     const hash = [
         'dashboard',
         'bot_builder',
-        'chart',
-        'tutorial',
-        'freebots',
-        'tools-hub',
         'smart-analysis',
         'analysis-tool',
         'copy-trading',
+        'tools-hub',
+        'ai-bot',
+        'signal',
+        'freebots',
+        'chart',
+        'tutorial'
     ];
     const { isDesktop } = useDevice();
     const navigate = useNavigate();
@@ -139,7 +144,7 @@ const AppWrapper = observer(() => {
         }
         if (connectionStatus === CONNECTION_STATUS.CLOSED) {
             setWebSocketState(false);
-        } else if (connectionStatus === CONNECTION_STATUS.OPEN) {
+        } else if (connectionStatus === CONNECTION_STATUS.OPENED) {
             setWebSocketState(true);
         }
     }, [connectionStatus]);
@@ -159,176 +164,212 @@ const AppWrapper = observer(() => {
 
     return (
         <ErrorBoundary>
-            <div className='main'>
-                <div
-                    className={classNames('main__container', {
-                        'main__container--active': active_tour && active_tab === DASHBOARD && !isDesktop,
-                    })}
-                >
-                    <Tabs
-                        active_index={active_tab}
-                        className='main__tabs'
-                        onTabItemClick={handleTabChange}
-                        top
-                        history={navigate as unknown as History}
+            <AuthProvider>
+                <div className='main'>
+                    <div
+                        className={classNames('main__container', {
+                            'main__container--active': active_tour && active_tab === DASHBOARD && !isDesktop,
+                        })}
                     >
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedObjectsColumnCaptionRegularIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Dashboard' />
-                                </>
-                            }
-                            id='id-dbot-dashboard'
+                        <Tabs
+                            active_index={active_tab}
+                            className='main__tabs'
+                            onTabItemClick={handleTabChange}
+                            top
+                            history={navigate as unknown as History}
                         >
-                            <Dashboard handleTabChange={handleTabChange} />
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Bot Builder' />
-                                </>
-                            }
-                            id='id-dbot-bot-builder'
-                        >
-                            <ToolsHub />
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedChartLineCaptionRegularIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Analysis Tool' />
-                                </>
-                            }
-                            id='id-analysis-tool'
-                        >
-                            <Suspense fallback={<ChunkLoader message='Loading Analysis Tool...' />}>
-                                <AnalysisTool />
-                            </Suspense>
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedChartLineCaptionRegularIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Copy Trading' />
-                                </>
-                            }
-                            id='id-copy-trading'
-                        >
-                            <Suspense fallback={<ChunkLoader message='Loading Copy Trading...' />}>
-                                <CopyTrading />
-                            </Suspense>
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedChartLineCaptionRegularIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Smart Analysis' />
-                                </>
-                            }
-                            id='id-smart-analysis'
-                        >
-                            <Suspense fallback={<ChunkLoader message='Loading Smart Analysis...' />}>
-                                <SmartAnalysisTool />
-                            </Suspense>
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedChartLineCaptionRegularIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Charts' />
-                                </>
-                            }
-                            id={
-                                is_chart_modal_visible || is_trading_view_modal_visible
-                                    ? 'id-charts--disabled'
-                                    : 'id-charts'
-                            }
-                        >
-                            <Suspense fallback={<ChunkLoader message='Loading charts...' />}>
-                                <ChartWrapper show_digits_stats={false} />
-                            </Suspense>
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LegacyGuide1pxIcon height='24px' width='24px' fill='var(--text-general)' />
-                                    <Localize i18n_default_text='Tutorials' />
-                                </>
-                            }
-                            id='id-tutorial'
-                        >
-                            <Suspense fallback={<ChunkLoader message='Loading tutorials...' />}>
-                                <Tutorial handleTabChange={handleTabChange} />
-                            </Suspense>
-                        </div>
-                        <div
-                            label={
-                                <>
-                                    <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                        height='24px'
-                                        width='24px'
-                                        fill='var(--text-general)'
-                                    />
-                                    <Localize i18n_default_text='Free Bots' />
-                                </>
-                            }
-                            id='id-free-bots'
-                        >
-                            <FreeBots />
-                        </div>
-                    </Tabs>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedObjectsColumnCaptionRegularIcon
+                                    height='24px'
+                                    width='24px'
+                                    fill='var(--text-general)'
+                                />
+                                <Localize i18n_default_text='Dashboard' />
+                            </>
+                                }
+                                id='id-dbot-dashboard'
+                            >
+                                <Dashboard handleTabChange={handleTabChange} />
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedPuzzlePieceTwoCaptionBoldIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Bot Builder' />
+                                    </>
+                                }
+                                id='id-dbot-bot-builder'
+                            >
+                                <ToolsHub />
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Analysis Tool' />
+                                    </>
+                                }
+                                id='id-analysis-tool'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading Analysis Tool...' />}>
+                                    <AnalysisTool />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Copy Trading' />
+                                    </>
+                                }
+                                id='id-copy-trading'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading Copy Trading...' />}>
+                                    <CopyTrading />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Smart Analysis' />
+                                    </>
+                                }
+                                id='id-smart-analysis'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading Smart Analysis...' />}>
+                                    <SmartAnalysisTool />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='AI Bot' />
+                                    </>
+                                }
+                                id='id-ai-bot'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading AI Bot...' />}>
+                                    <AIBot />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Signal Trader' />
+                                    </>
+                                }
+                                id='id-signal'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading Signal Trader...' />}>
+                                    <Signal />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedPuzzlePieceTwoCaptionBoldIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Free Bots' />
+                                    </>
+                                }
+                                id='id-free-bots'
+                            >
+                                <FreeBots />
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Charts' />
+                                    </>
+                                }
+                                id={
+                                    is_chart_modal_visible || is_trading_view_modal_visible
+                                        ? 'id-charts--disabled'
+                                        : 'id-charts'
+                                }
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading charts...' />}>
+                                    <ChartWrapper show_digits_stats={false} />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LegacyGuide1pxIcon height='24px' width='24px' fill='var(--text-general)' />
+                                        <Localize i18n_default_text='Tutorials' />
+                                    </>
+                                }
+                                id='id-tutorial'
+                            >
+                                <Suspense fallback={<ChunkLoader message='Loading tutorials...' />}>
+                                    <Tutorial handleTabChange={handleTabChange} />
+                                </Suspense>
+                            </div>
+                        </Tabs>
+                    </div>
                 </div>
-            </div>
-            <DesktopWrapper>
-                <div className='main__run-strategy-wrapper'>
-                    <RunStrategy />
-                    <RunPanel />
-                </div>
-                <ChartModal />
-                <TradingViewModal />
-            </DesktopWrapper>
-            <MobileWrapper>{!is_open && <RunPanel />}</MobileWrapper>
-            <Dialog
-                cancel_button_text={cancel_button_text || localize('Cancel')}
-                className='dc-dialog__wrapper--fixed'
-                confirm_button_text={ok_button_text || localize('Ok')}
-                has_close_icon
-                is_mobile_full_width={false}
-                is_visible={is_dialog_open}
-                onCancel={onCancelButtonClick || undefined}
-                onClose={onCloseDialog}
-                onConfirm={onOkButtonClick || onCloseDialog}
-                portal_element_id='modal_root'
-                title={title}
-            >
-                {message}
-            </Dialog>
+                <DesktopWrapper>
+                    <div className='main__run-strategy-wrapper'>
+                        <RunStrategy />
+                        <RunPanel />
+                    </div>
+                    <ChartModal />
+                    <TradingViewModal />
+                </DesktopWrapper>
+                <MobileWrapper>{!is_open && <RunPanel />}</MobileWrapper>
+                <Dialog
+                    cancel_button_text={cancel_button_text || localize('Cancel')}
+                    className='dc-dialog__wrapper--fixed'
+                    confirm_button_text={ok_button_text || localize('Ok')}
+                    has_close_icon
+                    is_mobile_full_width={false}
+                    is_visible={is_dialog_open}
+                    onCancel={onCancelButtonClick || undefined}
+                    onClose={onCloseDialog}
+                    onConfirm={onOkButtonClick || onCloseDialog}
+                    portal_element_id='modal_root'
+                    title={title}
+                >
+                    {message}
+                </Dialog>
+            </AuthProvider>
         </ErrorBoundary>
     );
 });

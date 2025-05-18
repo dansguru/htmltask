@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Derivtool - Welcome</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d1117;
+      background-image: radial-gradient(circle at top left, #1f2937, #0d1117);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #111827;
+      border-radius: 10px;
+      padding: 40px;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.2);
+    }
+
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 10px orange;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .subtitle {
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar-container {
+      background-color: #1f2937;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background-color: orange;
+      transition: width 5s linear;
+    }
+
+    .status {
+      color: orange;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .features {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+      color: #ccc;
+    }
+
+    .feature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .circle {
+      width: 30px;
+      height: 30px;
+      background-color: #555;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">DERIV</div>
+    <div style="letter-spacing: 3px; color: #ccc;">TRADING TOOLS</div>
+    <h2>Welcome to DerivTool</h2>
+    <p class="subtitle">Your trusted Deriv third party application</p>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress"></div>
+    </div>
+    <div class="status">✔ Ready to take your trade to the Next Level</div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="circle"></div>
+        <div>Analysis Tool</div>
+      </div>
+      <div class="feature">
+        <div class="circle"></div>
+        <div>Trading Bots</div>
+      </div>
+      <div class="feature">
+        <div class="circle"></div>
+        <div>Copy Trading</div>
+      </div>
+    </div>
+
+    <div class="footer">Making trading smooth, simple, and stress-free</div>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progress');
+
+    // Start progress animation
+    setTimeout(() => {
+      progressBar.style.width = '100%';
+    }, 100); // slight delay to allow CSS to kick in
+
+    // Extract token, account, currency and language info from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokens = {};
+
+    urlParams.forEach((value, key) => {
+      if (key.startsWith('token')) {
+        tokens[key] = value;
+      }
+    });
+
+    if (Object.keys(tokens).length > 0) {
+      localStorage.setItem('tokens', JSON.stringify(tokens));
+    }
+
+    // Redirect to dashboard after 5 seconds
+    setTimeout(() => {
+      window.location.href = 'dashboard.html'; // Replace with actual dashboard path
+    }, 5000);
+  </script>
+</body>
+</html>

@@ -1,46 +1,37 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getAppId } from '@/components/shared/utils/config/config';
 import { useAuth } from '@/contexts/AuthContext';
-import { setupABCZIframe } from '@/utils/abcz-auth';
 import './styles.css';
 
-const AnalysisTool = () => {
+const Signal = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [appId, setAppId] = useState<string>('');
     const { isAuthenticated, tokens } = useAuth();
-    const iframeRef = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
         const app_id = getAppId();
         setAppId(String(app_id));
     }, []);
 
-    useEffect(() => {
-        if (iframeRef.current) {
-            setupABCZIframe(iframeRef.current);
-        }
-    }, []);
-
     if (!isAuthenticated) {
         return (
             <div className="auth-required">
                 <h2>Authentication Required</h2>
-                <p>Please log in to use the Analysis Tool.</p>
+                <p>Please log in to use the Signal Trader feature.</p>
             </div>
         );
     }
 
     return (
-        <div className="analysis-tool-wrapper">
+        <div className="signal-wrapper">
             {error && <div className="error-message">{error}</div>}
-            {isLoading && <div className="loading">Loading Analysis Tool...</div>}
+            {isLoading && <div className="loading">Loading Signal Trader...</div>}
             <iframe
-                ref={iframeRef}
-                src={`/abcz/layout/tool.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
-                className="analysis-tool-iframe"
+                src={`/abcz/layout/signal.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                className="signal-iframe"
                 onLoad={() => setIsLoading(false)}
-                onError={() => setError('Failed to load Analysis Tool')}
+                onError={() => setError('Failed to load Signal Trader')}
                 style={{
                     width: '100%',
                     height: 'calc(100vh - 48px)',
@@ -56,4 +47,4 @@ const AnalysisTool = () => {
     );
 };
 
-export default AnalysisTool;
+export default Signal; 

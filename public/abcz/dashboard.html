@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DerivTool Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --text-color: #f4f4f4;
+      --header-footer-bg: #1e1e1e;
+      --active-color: orange;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #f4f4f4;
+      --header-footer-bg: #1e1e1e;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header, footer {
+      background-color: var(--header-footer-bg);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .logo span.deriv, .logo span.tool {
+      -webkit-text-stroke: 0.5px orange;
+      text-stroke: 0.5px orange;
+    }
+
+    .logo span.deriv {
+      color: black;
+    }
+
+    .logo span.tool {
+      color: red;
+    }
+
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-direction: row-reverse;
+      position: relative;
+    }
+
+    .auth-buttons button#signup-btn {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .auth-buttons button#login-btn {
+      background: none;
+      border: 1px solid orange;
+      color: orange;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 5px orange;
+    }
+
+    .wallet-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #44c2c2;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .wallet-flag {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .wallet-arrow {
+      color: #aaa;
+      font-size: 10px;
+    }
+
+    .wallet-dropdown {
+      display: none;
+      position: absolute;
+      top: 35px;
+      right: 0;
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      z-index: 1000;
+      width: 280px;
+    }
+
+    .wallet-dropdown.active {
+      display: block;
+    }
+
+    .wallet-dropdown {
+      font-size: 16px; /* Increase font size */
+      padding: 15px; /* Increase padding */
+    }
+
+    .account {
+      font-size: 16px; /* Increase font size */
+      padding: 10px 0; /* Increase vertical padding */
+    }
+
+    .account span img {
+      width: 20px; /* Increase icon size */
+      height: 20px; /* Increase icon size */
+      margin-right: 10px; /* Increase space between icon and text */
+    }
+
+    .wallet-arrow {
+      font-size: 14px; /* Increase the size of the arrow icon */
+      padding-left: 10px; /* Add some padding to the left of the arrow */
+    }
+
+    .wallet-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .account {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #333;
+      font-size: 14px;
+    }
+
+    .account:last-child {
+      border-bottom: none;
+    }
+
+    .account span img {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .account.active {
+      color: orange;
+      font-weight: bold;
+    }
+    
+    .wallet-dropdown {
+      background-color: #121212 !important;
+      color: #f4f4f4;
+    }
+
+    .navbar {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      background-color: var(--header-footer-bg);
+      border-top: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      color: var(--text-color);
+      font-size: 12px;
+    }
+
+    .nav-item.active {
+      border-bottom: 3px solid var(--active-color);
+      font-weight: bold;
+      color: orange;
+    }
+
+    .nav-item i {
+      margin-right: 5px;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    footer {
+      background-color: var(--header-footer-bg);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-ribbon {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 8px;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .status-circle {
+      width: 6px;
+      height: 6px;
+      background-color: red;
+      border-radius: 50%;
+    }
+
+    #clock {
+      font-weight: bold;
+      font-size: 8px;
+    }
+
+    .footer-icons {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-icons i {
+      cursor: pointer;
+      margin-left: 15px;
+    }
+
+    .language-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .language-modal-content {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 500px;
+      color: white;
+    }
+
+    .language-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .language-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .language-option img {
+      width: 30px;
+      height: 20px;
+    }
+  
+  
+    /* Floating Button */
+    #risk-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: orange !important;
+      color: black !important;
+      border: none;
+      padding: 4px 8px;
+      font-size: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit !important;
+    }
+
+    #risk-button svg {
+      width: 12px;
+      height: 12px;
+      fill: black !important;
+    }
+
+    /* Modal styles */
+    #risk-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    #risk-modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      font-size: 14px;
+      line-height: 1.6;
+      position: relative;
+      color: black !important;
+      font-family: inherit !important;
+    }
+
+    #close-modal {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    #close-modal:hover {
+      color: #000;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="dark-mode">
+  <header>
+    <div class="logo"><span class="deriv">DERIV</span><span class="tool">TOOL</span></div>
+    <div class="auth-buttons">
+      <button id="login-btn" onclick="handleAuthClick()">Login</button>
+      <button id="signup-btn" onclick="handleRegistrationClick()">Signup</button>
+
+      <div id="wallet-balance" class="wallet-container" onclick="toggleDropdown()">
+        <img id="wallet-icon" src="https://flagcdn.com/us.svg" alt="USD" class="wallet-flag" />
+        <span id="idbalance" class="wallet-amount">0.00 USD</span>
+        <i class="fas fa-chevron-down wallet-arrow"></i>
+
+            <!-- Dropdown List -->
+  <div id="wallet-dropdown" class="wallet-dropdown">
+    <div id="dropdownList" class="absolute mt-2 w-80 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+      <!-- Dropdown item template -->
+      <div class="px-4 py-2 font-semibold text-sm text-gray-500 border-b">Accounts</div>
+      
+      <div class="divide-y">
+        <!-- demo -->
+        <div id="demo" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://raw.githubusercontent.com/deriv-com/quill-icons/026d8198472de5616a23c89a893e506b8a976c46/svg/Currencies/CurrencyDemo.svg" alt="usd" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">Demo</div>
+              <div id="zz-demo" class="text-xs text-gray-500">CR552818</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-demo">0 USD</strong></div>
+        </div>
+
+        <!-- US Dollar -->
+        <div id="usd" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://static.vecteezy.com/system/resources/previews/013/743/592/non_2x/united-states-flag-round-icon-american-flag-png.png" alt="usd" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">US Dollar</div>
+              <div id="zz-usd" class="text-xs text-gray-500">CR552818</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-usd">0 USD</strong></div>
+        </div>
+
+        <!-- Bitcoin -->
+        <div id="btc" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/768px-Bitcoin.svg.png" alt="btc" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">Bitcoin</div>
+              <div id="zz-btc" class="text-xs text-gray-500">CR1170503</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-btc">0 BTC</strong></div>
+        </div>
+
+        <!-- Ethereum -->
+        <div id="eth" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://i.pinimg.com/564x/49/d1/0c/49d10cb0a3c978475a49f239e4e2f060.jpg" alt="eth" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">Ethereum</div>
+              <div id="zz-eth" class="text-xs text-gray-500">CR1139056</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-eth">0 ETH</strong></div>
+        </div>
+
+        <!-- Litecoin -->
+        <div id="ltc" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSid0Q-t6tthz58N-JyaIXup9vyONRaMxQnzA&s" alt="ltc" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">Litecoin</div>
+              <div id="zz-ltc" class="text-xs text-gray-500">CR2873962</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-ltc">0 LTC</strong></div>
+        </div>
+
+        <!-- Tether TRC20 -->
+        <div id="usdc" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50" style="display: none;">
+          <div class="flex items-center gap-3">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbBMfDxr1PrxlKVnOBktTGlNgXSVYUT0LB7Q&s" alt="usdc" class="w-6 h-6 rounded-full" />
+            <div>
+              <div class="font-medium text-gray-800">USD Coin</div>
+              <div id="zz-usdc" class="text-xs text-gray-500">CR7610423</div>
+            </div>
+          </div>
+          <div class="text-sm font-semibold text-gray-800 text-right"><strong id="aa-usdc">0 USDC</strong></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="navbar" id="navbar">
+    <div class="nav-item active" onclick="showContent('Dashboard', this)"><i class="fas fa-tachometer-alt"></i>Dashboard</div>
+    <div class="nav-item" onclick="showContent('Botbuilder', this)"><i class="fas fa-robot"></i>Botbuilder</div>
+    <div class="nav-item" onclick="showContent('SmartAnalysis', this)"><i class="fas fa-brain"></i>Smart analysis</div>
+    <div class="nav-item" onclick="showContent('AnalysisTool', this)"><i class="fas fa-chart-line"></i>Analysis tool</div>
+    <div class="nav-item" onclick="showContent('FreeBots', this)"><i class="fas fa-gift"></i>Free bots</div>
+    <div class="nav-item" onclick="showContent('CopyTrading', this)"><i class="fas fa-copy"></i>Copytrading</div>
+    <div class="nav-item" onclick="showContent('Charts', this)"><i class="fas fa-chart-pie"></i>Charts</div>
+    <div class="nav-item" onclick="showContent('AIBots', this)"><i class="fas fa-microchip"></i>AI Bots</div>
+    <div class="nav-item" onclick="showContent('Signals', this)"><i class="fas fa-signal"></i>Signals</div>
+  </div>
+
+  <main id="content">
+    <h2>Welcome to the Dashboard</h2>
+    <p>This is the default content area for the Dashboard.</p>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <div class="footer-ribbon">
+          <div class="status-circle"></div>
+          <div id="clock"></div>
+        </div>
+      </div>
+      <div class="footer-icons">
+        <i class="fas fa-moon" onclick="toggleTheme()" title="Toggle Theme"></i>
+        <i class="fas fa-language" onclick="showLanguageModal()" title="Change Language"></i>
+        <img src="https://flagcdn.com/gb.svg" alt="English" width="20">
+      </div>
+    </div>
+  </footer>
+
+  <div class="language-modal" id="languageModal" onclick="hideLanguageModal(event)">
+    <div class="language-modal-content" onclick="event.stopPropagation()">
+      <h2>Select Language</h2>
+      <div class="language-grid">
+        <div class="language-option"><img src="https://flagcdn.com/gb.svg"><span>English</span></div>
+        <div class="language-option"><img src="https://flagcdn.com/fr.svg"><span>Français</span></div>
+        <div class="language-option"><img src="https://flagcdn.com/es.svg"><span>Español</span></div>
+      </div>
+    </div>
+  </div>
+  
+   <!-- Floating Button -->
+  <button id="risk-button">
+    <svg viewBox="0 0 24 24">
+      <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+    </svg>
+    Risk Disclaimer
+  </button>
+
+  <!-- Modal -->
+  <div id="risk-modal">
+    <div id="risk-modal-content">
+      <span id="close-modal">&times;</span>
+      <p>
+        Deriv offers complex derivatives, such as options and contracts for difference (“CFDs”). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products:
+      </p>
+      <ul>
+        <li>a) You may lose some or all of the money you invest in the trade.</li>
+        <li>b) If your trade involves currency conversion, exchange rates will affect your profit and loss.</li>
+      </ul>
+      <p>
+        You should never trade with borrowed money or with money that you cannot afford to lose.
+      </p>
+    </div>
+  </div>
+
+    <script src="dashboard.js"></script>
+    
+    <script>
+    const riskButton = document.getElementById('risk-button');
+    const riskModal = document.getElementById('risk-modal');
+    const closeModal = document.getElementById('close-modal');
+
+    riskButton.onclick = () => {
+      riskModal.style.display = 'block';
+    };
+
+    closeModal.onclick = () => {
+      riskModal.style.display = 'none';
+    };
+
+    window.onclick = (event) => {
+      if (event.target == riskModal) {
+        riskModal.style.display = 'none';
+      }
+    };
+  </script>
+
+</body>
+</html>
