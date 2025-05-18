@@ -2,18 +2,47 @@
     background-color: #ff444f;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
+    padding: 12px 24px;
+    border-radius: 24px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 68, 79, 0.4);
+    transition: all 0.3s ease;
     font-size: 16px;
     margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    outline: none;
 }
 
 .deriv-login-button:hover {
     background-color: #e03039;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 68, 79, 0.5);
+}
+
+.deriv-login-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 68, 79, 0.4);
+}
+
+.deriv-login-button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.deriv-login-button:hover::after {
+    opacity: 1;
 }
 
 .auth-required {
@@ -27,19 +56,34 @@
     background-color: rgba(0, 0, 0, 0.03);
     border-radius: 8px;
     margin: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-required::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(255, 68, 79, 0.05) 0%, transparent 70%);
+    z-index: -1;
 }
 
 .auth-required h2 {
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 16px;
     color: #333;
+    font-weight: bold;
 }
 
 .auth-required p {
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 24px;
     color: #666;
     max-width: 500px;
+    line-height: 1.5;
 }
 
 .auth-required-overlay {
@@ -48,24 +92,33 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.97);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 999;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .auth-required-overlay h2 {
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 16px;
     color: #333;
+    font-weight: bold;
 }
 
 .auth-required-overlay p {
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 24px;
     color: #666;
     max-width: 500px;
     text-align: center;
+    line-height: 1.5;
 } 
