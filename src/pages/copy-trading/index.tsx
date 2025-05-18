@@ -52,11 +52,21 @@ const CopyTrading: React.FC = () => {
         <div className="copy-trading-container">
             <iframe
                 ref={iframeRef}
-                src={`https://copy-trading.abcz.com?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`/abcz/layout/copytrading.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
                 className="copy-trading-iframe"
                 title="Copy Trading"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                style={{
+                    width: '100%',
+                    height: 'calc(100vh - 48px)',
+                    border: 'none',
+                    position: 'absolute',
+                    top: '48px',
+                    left: 0,
+                    right: 0,
+                    bottom: 0
+                }}
             />
         </div>
     );

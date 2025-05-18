@@ -52,11 +52,21 @@ const AIBot: React.FC = () => {
         <div className="ai-bot-container">
             <iframe
                 ref={iframeRef}
-                src={`https://ai-bot.abcz.com?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`/abcz/layout/thebot.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
                 className="ai-bot-iframe"
                 title="AI Bot"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                style={{
+                    width: '100%',
+                    height: 'calc(100vh - 48px)',
+                    border: 'none',
+                    position: 'absolute',
+                    top: '48px',
+                    left: 0,
+                    right: 0,
+                    bottom: 0
+                }}
             />
         </div>
     );

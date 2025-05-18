@@ -54,7 +54,7 @@ const SmartAnalysisTool: React.FC = () => {
         <div className="smart-analysis-container">
             <iframe
                 ref={iframeRef}
-                src={`https://smart-analysis.abcz.com?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`/abcz/layout/analysis.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
                 className="smart-analysis-iframe"
                 title="Smart Analysis Tool"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

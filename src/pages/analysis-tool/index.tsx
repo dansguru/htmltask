@@ -52,11 +52,21 @@ const AnalysisTool: React.FC = () => {
         <div className="analysis-tool-container">
             <iframe
                 ref={iframeRef}
-                src={`https://analysis-tool.abcz.com?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
+                src={`/abcz/layout/tool.html?app_id=${appId}&tokens=${encodeURIComponent(JSON.stringify(tokens))}`}
                 className="analysis-tool-iframe"
                 title="Analysis Tool"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                style={{
+                    width: '100%',
+                    height: 'calc(100vh - 48px)',
+                    border: 'none',
+                    position: 'absolute',
+                    top: '48px',
+                    left: 0,
+                    right: 0,
+                    bottom: 0
+                }}
             />
         </div>
     );

@@ -32,6 +32,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     if (activeLoginId) {
                         setActiveLoginId(activeLoginId);
                     }
+                    
+                    // Send a message to any ABCZ iframes in the page
+                    const iframes = document.querySelectorAll('iframe');
+                    iframes.forEach(iframe => {
+                        if (iframe.contentWindow && iframe.src.includes('/abcz/')) {
+                            iframe.contentWindow.postMessage({
+                                type: 'ABCZ_AUTH_UPDATE',
+                                data: { 
+                                    tokens: tokensObj,
+                                    clientId,
+                                    activeLoginId
+                                }
+                            }, window.location.origin);
+                            
+                            // Also use the format from dashboard.js
+                            iframe.contentWindow.postMessage({
+                                authorize: tokensObj,
+                                login_id: activeLoginId,
+                                client_id: clientId
+                            }, window.location.origin);
+                        }
+                    });
                 } catch (error) {
                     console.error('Error parsing tokens:', error);
                 }
@@ -58,14 +80,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Listen for messages from parent window (Deriv)
         const handleMessage = (event: MessageEvent) => {
-            // Accept messages from Deriv domains
+            // Accept messages from Deriv domains or same origin
             if (event.origin === 'https://app.deriv.com' || 
                 event.origin === 'https://oauth.deriv.com' ||
-                event.origin === 'https://deriv.com') {
+                event.origin === 'https://deriv.com' ||
+                event.origin === window.location.origin) {
                 
                 if (event.data?.type === 'auth' || 
                     event.data?.type === 'login' || 
-                    event.data?.type === 'logout') {
+                    event.data?.type === 'logout' ||
+                    event.data?.authorize) {
                     checkAuth();
                 }
             }
